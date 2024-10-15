@@ -272,8 +272,9 @@ impl<C: Signing> Secp256k1<C> {
 
     /// Constructs a signature for `msg` using the secret key `sk` and RFC6979 nonce
     /// Requires a signing-capable context.
-    pub fn sign_ecdsa(&self, msg: &Message, sk: &SecretKey) -> Signature {
-        self.sign_ecdsa_with_noncedata_pointer(msg, sk, None)
+    pub fn sign_ecdsa(&self, msg: impl Into<Message>, sk: &SecretKey) -> Signature {
+        let message: Message = msg.into();
+        self.sign_ecdsa_with_noncedata_pointer(&message, sk, None)
     }
 
     /// Constructs a signature for `msg` using the secret key `sk` and RFC6979 nonce
@@ -283,11 +284,12 @@ impl<C: Signing> Secp256k1<C> {
     /// Requires a signing-capable context.
     pub fn sign_ecdsa_with_noncedata(
         &self,
-        msg: &Message,
+        msg: impl Into<Message>,
         sk: &SecretKey,
         noncedata: &[u8; 32],
     ) -> Signature {
-        self.sign_ecdsa_with_noncedata_pointer(msg, sk, Some(noncedata))
+        let message: Message = msg.into();
+        self.sign_ecdsa_with_noncedata_pointer(&message, sk, Some(noncedata))
     }
 
     fn sign_grind_with_check(
@@ -338,12 +340,13 @@ impl<C: Signing> Secp256k1<C> {
     /// Requires a signing capable context.
     pub fn sign_ecdsa_grind_r(
         &self,
-        msg: &Message,
+        msg: impl Into<Message>,
         sk: &SecretKey,
         bytes_to_grind: usize,
     ) -> Signature {
         let len_check = |s: &ffi::Signature| der_length_check(s, 71 - bytes_to_grind);
-        self.sign_grind_with_check(msg, sk, len_check)
+        let message: Message = msg.into();
+        self.sign_grind_with_check(&message, sk, len_check)
     }
 
     /// Constructs a signature for `msg` using the secret key `sk`, RFC6979 nonce
@@ -352,8 +355,9 @@ impl<C: Signing> Secp256k1<C> {
     /// signature implementation of bitcoin core. In average, this function
     /// will perform two signing operations.
     /// Requires a signing capable context.
-    pub fn sign_ecdsa_low_r(&self, msg: &Message, sk: &SecretKey) -> Signature {
-        self.sign_grind_with_check(msg, sk, compact_sig_has_zero_first_bit)
+    pub fn sign_ecdsa_low_r(&self, msg: impl Into<Message>, sk: &SecretKey) -> Signature {
+        let message: Message = msg.into();
+        self.sign_grind_with_check(&message, sk, compact_sig_has_zero_first_bit)
     }
 }
 

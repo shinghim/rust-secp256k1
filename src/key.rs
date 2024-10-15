@@ -338,7 +338,10 @@ impl SecretKey {
     /// Constructs an ECDSA signature for `msg` using the global [`SECP256K1`] context.
     #[inline]
     #[cfg(feature = "global-context")]
-    pub fn sign_ecdsa(&self, msg: Message) -> ecdsa::Signature { SECP256K1.sign_ecdsa(&msg, self) }
+    pub fn sign_ecdsa(&self, msg: impl Into<Message>) -> ecdsa::Signature {
+        let message: Message = msg.into();
+        SECP256K1.sign_ecdsa(&message, self)
+    }
 
     /// Returns the [`Keypair`] for this [`SecretKey`].
     ///

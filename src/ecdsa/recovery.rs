@@ -182,10 +182,11 @@ impl<C: Signing> Secp256k1<C> {
     /// Requires a signing-capable context.
     pub fn sign_ecdsa_recoverable(
         &self,
-        msg: &Message,
+        msg: impl Into<Message>,
         sk: &key::SecretKey,
     ) -> RecoverableSignature {
-        self.sign_ecdsa_recoverable_with_noncedata_pointer(msg, sk, ptr::null())
+        let message: Message = msg.into();
+        self.sign_ecdsa_recoverable_with_noncedata_pointer(&message, sk, ptr::null())
     }
 
     /// Constructs a signature for `msg` using the secret key `sk` and RFC6979 nonce
@@ -195,12 +196,13 @@ impl<C: Signing> Secp256k1<C> {
     /// Requires a signing-capable context.
     pub fn sign_ecdsa_recoverable_with_noncedata(
         &self,
-        msg: &Message,
+        msg: impl Into<Message>,
         sk: &key::SecretKey,
         noncedata: &[u8; 32],
     ) -> RecoverableSignature {
         let noncedata_ptr = noncedata.as_ptr() as *const super_ffi::types::c_void;
-        self.sign_ecdsa_recoverable_with_noncedata_pointer(msg, sk, noncedata_ptr)
+        let message: Message = msg.into();
+        self.sign_ecdsa_recoverable_with_noncedata_pointer(&message, sk, noncedata_ptr)
     }
 }
 
